@@ -19,12 +19,22 @@ Currently, URL is generated through Google Spreadsheets.
 
 1 - Clone the repository
 
+```sh
+git clone https://github.com/tales-lopes-meli/testing-acq-dates.git
+```
+
 2 - Generate paths.csv
 
+- It is necessary to store paths.csv in root directory.
+
 3 - Execute the script
+
+```sh
+sh start.sh
+```
 
 4 - Check out your results
 
 ## Attention
 
-In average, execution time exceeds 40 minutes.
+It necessary to enable VPN to execute correctly.
