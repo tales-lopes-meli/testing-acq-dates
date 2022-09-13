@@ -1,0 +1,2 @@
+ARN,URL
+24234282040000080927605,https://internal-api.mercadopago.com/acq-dates/staging-api/v2/settlement_value_dates/visa/br?reconciliation_date=2022-05-14&original_reconciliation_date=2022-02-10&transaction_type=credit&international=false&transaction_code=15&settlement_type=27
