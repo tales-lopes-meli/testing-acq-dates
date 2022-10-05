@@ -20,7 +20,7 @@ func check(e error) {
 const (
 	FilePath       = "paths.csv"
 	OutputFilePath = "output"
-	BlockSize      = 50
+	BlockSize      = 30
 	RoutinesAmount = 6
 )
 
