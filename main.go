@@ -39,7 +39,7 @@ type Response struct {
 }
 
 func (r Response) converser(arn string) []string {
-	return []string{arn, r.ReconciliationDate, r.SettlementDate, r.ValueDate, r.MerchantDate, fmt.Sprintf("%d", r.WorkingDays), fmt.Sprintf("%d", r.CalendarDays)}
+	return []string{arn, r.ReconciliationDate, r.SettlementDate, r.ValueDate, r.MerchantDate, fmt.Sprintf("%d", r.WorkingDays), fmt.Sprintf("%d", r.CalendarDays), r.ValidToUTC}
 }
 
 func getData(data [][]string, begin int, end int, i int) {
