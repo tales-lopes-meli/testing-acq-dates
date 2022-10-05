@@ -7,7 +7,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
-	"sync"
 	"time"
 )
 
@@ -102,10 +101,6 @@ func getData(data [][]string, begin int, end int, i int) {
 
 func main() {
 
-	var begin int
-	var end int
-	var wg sync.WaitGroup
-
 	f, err := os.Open(FilePath)
 
 	check(err)
@@ -125,20 +120,9 @@ func main() {
 
 	fmt.Println("Execution started!")
 
-	for i := 1; i <= RoutinesAmount; i++ {
-		wg.Add(i)
-		begin = ((i - 1) * BlockSize) + 1
-		if i != 6 {
-			end = (i) * BlockSize
-		} else {
-			end = len(data) - 1
-		}
-		go getData(data, begin, end, i)
-	}
+	getData(data, 1, len(data)-1, 1)
 
 	// Writing
-
-	wg.Wait()
 
 	fmt.Println("Execution ended!")
 }
