@@ -20,11 +20,11 @@ func check(e error) {
 const (
 	FilePath       = "paths.csv"
 	OutputFilePath = "output"
-	BlockSize      = 3393
+	BlockSize      = 50
 	RoutinesAmount = 6
 )
 
-var OutputHeader = []string{"arn", "reconciliation_date", "settlement_date", "value_date", "merchant_date", "working_days", "calendar_days"}
+var OutputHeader = []string{"arn", "reconciliation_date", "settlement_date", "value_date", "merchant_date", "working_days", "calendar_days", "valid_to_utc"}
 
 // var mappedResponses = make(map[string][]string)
 
@@ -35,6 +35,7 @@ type Response struct {
 	MerchantDate       string `json:"merchant_date"`
 	WorkingDays        int    `json:"working_days"`
 	CalendarDays       int    `json:"calendar_days"`
+	ValidToUTC         string `json:"valid_to_utc"`
 }
 
 func (r Response) converser(arn string) []string {
