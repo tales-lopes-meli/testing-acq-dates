@@ -57,16 +57,17 @@ func getData(data [][]string, begin int, end int, i int) {
 
 		check(err)
 
-		defer resp.Body.Close()
+		if err == nil {
+			body, err := ioutil.ReadAll(resp.Body)
 
-		body, err := ioutil.ReadAll(resp.Body)
+			check(err)
 
-		check(err)
+			// Unmarshaling data
+			json.Unmarshal(body, &response)
 
-		// Unmarshaling data
-		json.Unmarshal(body, &response)
-
-		mappedResponses[currentArn] = append(mappedResponses[currentArn], response.converser(currentArn))
+			mappedResponses[currentArn] = append(mappedResponses[currentArn], response.converser(currentArn))
+			defer resp.Body.Close()
+		}
 
 		time.Sleep(500 * time.Millisecond)
 	}
