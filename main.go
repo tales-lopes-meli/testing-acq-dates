@@ -69,7 +69,7 @@ func getData(data [][]string, begin int, end int, i int) {
 			defer resp.Body.Close()
 		}
 
-		time.Sleep(500 * time.Millisecond)
+		time.Sleep(100 * time.Millisecond)
 	}
 
 	outputFile, err := os.Create(fmt.Sprintf("%s%d.csv", OutputFilePath, i))
