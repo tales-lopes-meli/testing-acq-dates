@@ -21,6 +21,8 @@ const (
 	OutputFilePath = "output"
 	BlockSize      = 30
 	RoutinesAmount = 6
+	FuryToken      = "Bearer <Fury Token>"
+	RequestHeader  = "X-Tiger-Token"
 )
 
 var OutputHeader = []string{"arn", "reconciliation_date", "settlement_date", "value_date", "merchant_date", "working_days", "calendar_days", "valid_to_utc"}
@@ -43,6 +45,8 @@ func (r Response) converser(arn string) []string {
 
 func getData(data [][]string, begin int, end int, i int) {
 
+	client := http.Client{}
+
 	var response Response
 
 	mappedResponses := make(map[string][][]string)
@@ -53,9 +57,13 @@ func getData(data [][]string, begin int, end int, i int) {
 		currentArn := data[i][0]
 
 		// Using net/http for a HTTP GET request
-		resp, err := http.Get(currentURL)
+		// resp, err := http.Get(currentURL)
+		req, err := http.NewRequest("GET", currentURL, nil)
 
 		check(err)
+
+		req.Header.Set(RequestHeader, FuryToken)
+		resp, err := client.Do(req)
 
 		if err == nil {
 			body, err := ioutil.ReadAll(resp.Body)
