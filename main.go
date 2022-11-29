@@ -21,11 +21,11 @@ const (
 	OutputFilePath = "output"
 	BlockSize      = 30
 	RoutinesAmount = 6
-	FuryToken      = "Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6ImQ0ZDlhMGQzLWM4YTItNDY0Yi1hMGE5LWU3MWM2OTA0MjExNiIsInR5cCI6IkpXVCJ9.eyJhZGRpdGlvbmFsX2luZm8iOnsiZW1haWwiOiJ0YWxlcy5sb3Blc0BtZXJjYWRvbGl2cmUuY29tIiwiZnVsbF9uYW1lIjoiVGFsZXMgQmFsdGFyIExvcGVzIERhIFNpbHZhIiwidXNlcm5hbWUiOiJ0YWxvcGVzIn0sImV4cCI6MTY2OTc1NzYwNCwiaWF0IjoxNjY5NzI1MjA0LCJpZGVudGl0eSI6Im1ybjpzZWdpbmY6YWQ6dXNlci90YWxvcGVzIiwiaXNzIjoiZnVyeV90aWdlciIsInN1YiI6InRhbG9wZXMifQ.fDVTJJLPJHsJU0LEXAV7a7QiJx9TWXBSbllB-dF4Vqx1F1KlM-BgCAUH0VwyycavfRlqCrH43yFk_9I3r5LaPWbW6czNofsdwpLjH_G4R-c-b5bJqytkuIxNLViuByNJrWirXCS5gjepQg6kAmuNIWhgC4o4M-CoicJT7MljOFkGz9od4bijryqoMNWC_6yilk8F_sPlJIfP5Ien8TXbEcyhPsxV_H2jWwIaHqaJRrd4S3De64PSFu_3k8MelNwqsuSa0pIR_WZrTT7WA_4_quCImF3nLt4NIGGGKLf-SdFekFqz4HG5xrKNJiEpmFxAyQtmnFkmi6SszdL42J4Txw"
+	FuryToken      = "Bearer <Fury_Token>"
 	RequestHeader  = "X-Tiger-Token"
 )
 
-var OutputHeader = []string{"arn", "installment_1", "business_date_1", "from_1", "to_1", "reconciliation_date_1", "settlement_date_1", "value_date_1", "merchant_date_1", "working_days_1", "calendar_days_1", "valid_to_utc_1", "installment_2", "business_date_2", "from_2", "to_2", "reconciliation_date_2", "settlement_date_2", "value_date_2", "merchant_date_2", "working_days_2", "calendar_days_2", "valid_to_utc_2"}
+// var OutputHeader = []string{"arn", "installment", "business_date", "from", "to", "reconciliation_date", "settlement_date", "value_date", "merchant_date", "working_days", "calendar_days", "valid_to_utc"}
 
 // var mappedResponses = make(map[string][]string)
 
@@ -47,8 +47,8 @@ type Response struct {
 	Schedule     Schedule `json:"schedule"`
 }
 
-func converser(arn string, r []Response) []string {
-	return []string{arn, fmt.Sprintf("%d", r[0].Installment), r[0].BusinessDate, r[0].From, r[0].To, r[0].Schedule.ReconciliationDate, r[0].Schedule.SettlementDate, r[0].Schedule.ValueDate, r[0].Schedule.MerchantDate, fmt.Sprintf("%d", r[0].Schedule.WorkingDays), fmt.Sprintf("%d", r[0].Schedule.CalendarDays), r[0].Schedule.ValidToUTC, fmt.Sprintf("%d", r[1].Installment), r[1].BusinessDate, r[1].From, r[1].To, r[1].Schedule.ReconciliationDate, r[1].Schedule.SettlementDate, r[1].Schedule.ValueDate, r[1].Schedule.MerchantDate, fmt.Sprintf("%d", r[1].Schedule.WorkingDays), fmt.Sprintf("%d", r[1].Schedule.CalendarDays), r[1].Schedule.ValidToUTC}
+func (r Response) converser(arn string) []string {
+	return []string{arn, fmt.Sprintf("%d", r.Installment), r.BusinessDate, r.From, r.To, r.Schedule.ReconciliationDate, r.Schedule.SettlementDate, r.Schedule.ValueDate, r.Schedule.MerchantDate, fmt.Sprintf("%d", r.Schedule.WorkingDays), fmt.Sprintf("%d", r.Schedule.CalendarDays), r.Schedule.ValidToUTC}
 }
 
 func getData(data [][]string, begin int, end int, i int) {
@@ -81,10 +81,12 @@ func getData(data [][]string, begin int, end int, i int) {
 			// Unmarshaling data
 			json.Unmarshal(body, &responses)
 
-			mappedResponses[currentArn] = append(mappedResponses[currentArn], converser(currentArn, responses))
-		}
+			for idx, response := range responses {
+				mappedResponses[fmt.Sprintf("%s_%d", currentArn, idx+1)] = append(mappedResponses[fmt.Sprintf("%s_%d", currentArn, idx+1)], response.converser(fmt.Sprintf("%s_%d", currentArn, idx+1)))
+			}
 
-		defer resp.Body.Close()
+			defer resp.Body.Close()
+		}
 
 		time.Sleep(100 * time.Millisecond)
 	}
@@ -96,8 +98,6 @@ func getData(data [][]string, begin int, end int, i int) {
 	defer outputFile.Close()
 
 	w := csv.NewWriter(outputFile)
-
-	err = w.Write(OutputHeader)
 
 	check(err)
 
