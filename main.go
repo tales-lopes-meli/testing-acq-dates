@@ -25,11 +25,11 @@ const (
 	RequestHeader  = "X-Tiger-Token"
 )
 
-var OutputHeader = []string{"arn", "reconciliation_date", "settlement_date", "value_date", "merchant_date", "working_days", "calendar_days", "valid_to_utc"}
+var OutputHeader = []string{"arn", "installment_1", "business_date_1", "from_1", "to_1", "reconciliation_date_1", "settlement_date_1", "value_date_1", "merchant_date_1", "working_days_1", "calendar_days_1", "valid_to_utc_1", "installment_2", "business_date_2", "from_2", "to_2", "reconciliation_date_2", "settlement_date_2", "value_date_2", "merchant_date_2", "working_days_2", "calendar_days_2", "valid_to_utc_2"}
 
 // var mappedResponses = make(map[string][]string)
 
-type Response struct {
+type Schedule struct {
 	ReconciliationDate string `json:"reconciliation_date"`
 	SettlementDate     string `json:"settlement_date"`
 	ValueDate          string `json:"value_date"`
@@ -39,15 +39,23 @@ type Response struct {
 	ValidToUTC         string `json:"valid_to_utc"`
 }
 
-func (r Response) converser(arn string) []string {
-	return []string{arn, r.ReconciliationDate, r.SettlementDate, r.ValueDate, r.MerchantDate, fmt.Sprintf("%d", r.WorkingDays), fmt.Sprintf("%d", r.CalendarDays), r.ValidToUTC}
+type Response struct {
+	Installment  int      `json:"installment"`
+	BusinessDate string   `json:"business_date"`
+	From         string   `json:"from"`
+	To           string   `json:"to"`
+	Schedule     Schedule `json:"schedule"`
+}
+
+func converser(arn string, r []Response) []string {
+	return []string{arn, fmt.Sprintf("%d", r[0].Installment), r[0].BusinessDate, r[0].From, r[0].To, r[0].Schedule.ReconciliationDate, r[0].Schedule.SettlementDate, r[0].Schedule.ValueDate, r[0].Schedule.MerchantDate, fmt.Sprintf("%d", r[0].Schedule.WorkingDays), fmt.Sprintf("%d", r[0].Schedule.CalendarDays), r[0].Schedule.ValidToUTC, fmt.Sprintf("%d", r[1].Installment), r[1].BusinessDate, r[1].From, r[1].To, r[1].Schedule.ReconciliationDate, r[1].Schedule.SettlementDate, r[1].Schedule.ValueDate, r[1].Schedule.MerchantDate, fmt.Sprintf("%d", r[1].Schedule.WorkingDays), fmt.Sprintf("%d", r[1].Schedule.CalendarDays), r[1].Schedule.ValidToUTC}
 }
 
 func getData(data [][]string, begin int, end int, i int) {
 
 	client := http.Client{}
 
-	var response Response
+	var responses []Response
 
 	mappedResponses := make(map[string][][]string)
 
@@ -71,11 +79,12 @@ func getData(data [][]string, begin int, end int, i int) {
 			check(err)
 
 			// Unmarshaling data
-			json.Unmarshal(body, &response)
+			json.Unmarshal(body, &responses)
 
-			mappedResponses[currentArn] = append(mappedResponses[currentArn], response.converser(currentArn))
-			defer resp.Body.Close()
+			mappedResponses[currentArn] = append(mappedResponses[currentArn], converser(currentArn, responses))
 		}
+
+		defer resp.Body.Close()
 
 		time.Sleep(100 * time.Millisecond)
 	}
